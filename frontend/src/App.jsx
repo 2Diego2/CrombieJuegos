@@ -1,9 +1,9 @@
-// client/src/App.js
-
 import React, { useState } from 'react';
+import { Routes, Route } from 'react-router-dom';
 import axios from 'axios';
+import Home from './pages/Home.jsx';
 
-function App() {
+function DifficultySelection() {
   const [dificultad, setDificultad] = useState('');
   const [mensaje, setMensaje] = useState('');
 
@@ -31,6 +31,15 @@ function App() {
         </div>
       )}
     </div>
+  );
+}
+
+function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/difficulty" element={<DifficultySelection />} />
+    </Routes>
   );
 }
 
