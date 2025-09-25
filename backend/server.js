@@ -15,9 +15,9 @@ app.get('/api/dificultad/:nivel', (req, res) => {
   const { nivel } = req.params;
   let mensaje = '';
 
-  if (nivel === 'facil') mensaje = 'Elegiste nivel Fácil 🎉';
-  if (nivel === 'intermedio') mensaje = 'Seleccionaste Intermedio ⚡';
-  if (nivel === 'dificil') mensaje = 'Modo Difícil 🔥';
+  if (nivel === 'facil');
+  if (nivel === 'intermedio');
+  if (nivel === 'dificil');
 
   res.json({ mensaje });
 });
