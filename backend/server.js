@@ -11,6 +11,18 @@ const port = 5000; // Cambiar a 5000 para evitar conflictos con el frontend
 app.use(cors()); // Permite las solicitudes CORS desde el frontend
 app.use(express.json()); // Para manejar JSON en las solicitudes
 
+app.get('/api/dificultad/:nivel', (req, res) => {
+  const { nivel } = req.params;
+  let mensaje = '';
+
+  if (nivel === 'facil') mensaje = 'Elegiste nivel Fácil 🎉';
+  if (nivel === 'intermedio') mensaje = 'Seleccionaste Intermedio ⚡';
+  if (nivel === 'dificil') mensaje = 'Modo Difícil 🔥';
+
+  res.json({ mensaje });
+});
+
+
 // Ruta para manejar la selección de preguntas de acuerdo a la categoría y dificultad
 app.get('/api/preguntas/:categoria/:dificultad', (req, res) => {
   const { categoria, dificultad } = req.params;
@@ -31,3 +43,4 @@ app.listen(port, () => {
   console.log(`Server running on port ${port}`
     );  
 });
+
