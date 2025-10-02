@@ -5,10 +5,6 @@ import "../pages/css/home.css"
 export default function Home() {
   const navigate = useNavigate();
 
-  const iniciarJuego = () => {
-    navigate('/difficulty');
-  };
-
   return (
     <div className="home-container">
       <img className="header-img" src="cropped2.svg" alt="Logo"/>
@@ -16,7 +12,7 @@ export default function Home() {
       <main className="main-content">
         <button
           className="start-game-button"
-          onClick={iniciarJuego}
+          onClick= {() => navigate("/seleccion-dificultad")}
         >
           Iniciar Juego
         </button>
@@ -25,9 +21,7 @@ export default function Home() {
       <footer className="footer-section">
         <button
           className="gestor-button"
-          onClick={() => {
-            console.log("Gestor clicked")
-          }}
+          onClick= {() => navigate()}
         >
           gestor
         </button>

@@ -1,0 +1,328 @@
+/*
+ * Archivo: src/pages/css/juego.css
+ * ESTILOS CSS REEMPLAZANDO TAILWIND
+ */
+
+/* ================================================= */
+/* VARIABLES Y TEMAS (AJUSTAR COLORES)      */
+/* ================================================= */
+
+:root {
+    /* Colores base (ajustar si usas un tema oscuro específico) */
+    --color-background: #1e1e2e;
+    --color-card: #2e3b50;
+    --color-border: #4a5a75;
+    --color-foreground: #ffffff;
+    --color-muted-foreground: #a0a8b9;
+    
+    /* Colores funcionales (equivalentes a green-500, red-500) */
+    --color-success: #10b981; /* Verde */
+    --color-error: #ef4444; /* Rojo */
+
+    /* Colores para las animaciones de los puntos */
+    --color-anim-1: #8a2be2; /* Púrpura */
+    --color-anim-2: #00bcd4; /* Cian */
+    --color-anim-3: #ff9800; /* Naranja */
+
+    /* Gradientes (DEBES REEMPLAZAR ESTOS POR TUS GRADIENTES REALES) */
+    --crombie-gradient-1: linear-gradient(to right, #8a2be2, #4c4cff);
+    --crombie-gradient-2: linear-gradient(to right, #4c4cff, #00bcd4);
+    --crombie-gradient-3: linear-gradient(to right, #00bcd4, #10b981);
+}
+
+body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    margin: 0;
+    padding: 0;
+}
+
+/* ================================================= */
+/* CONTENEDOR PRINCIPAL                 */
+/* ================================================= */
+
+.slot-machine-container {
+    max-width: 48rem; /* max-w-2xl */
+    margin: 0 auto; /* mx-auto */
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem; /* space-y-6 */
+    padding: 1rem;
+}
+
+/* Base de las Cards */
+.card-pregunta, .card-progreso {
+    padding: 1.5rem; /* p-6 */
+    background-color: var(--color-card);
+    border: 1px solid var(--color-border);
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+}
+
+.contenido-card {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem; /* space-y-4 */
+}
+
+.titulo-principal {
+    font-size: 1.25rem;
+    font-weight: bold;
+    text-align: center;
+    color: var(--color-foreground);
+}
+
+/* ================================================= */
+/* ESTADO GIRANDO (SPINNING)            */
+/* ================================================= */
+
+.slot-girando-estado {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.texto-girando {
+    text-align: center;
+    color: var(--color-muted-foreground);
+}
+
+.contenedor-ruedas {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+}
+
+.rueda-item {
+    padding: 0.75rem;
+    background: var(--crombie-gradient-1);
+    border-radius: 0.5rem;
+    color: white;
+    text-align: center;
+    /* Reemplazo de animate-pulse de Tailwind */
+    animation: pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.texto-rueda {
+    font-size: 0.875rem;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+/* Puntos de animación (Spinner) */
+.puntos-animados {
+    display: flex;
+    justify-content: center;
+    gap: 0.25rem;
+}
+
+.punto-animado {
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 50%;
+    /* Reemplazo de animate-bounce de Tailwind */
+    animation: bounce 1s infinite;
+}
+
+.punto-1 { background-color: var(--color-anim-1); }
+.punto-2 { background-color: var(--color-anim-2); }
+.punto-3 { background-color: var(--color-anim-3); }
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(-25%);
+        animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+    }
+    50% {
+        transform: translateY(0);
+        animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+    }
+}
+
+/* ================================================= */
+/* ESTADO PREGUNTA ACTIVA               */
+/* ================================================= */
+
+.pregunta-activa-estado {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.contenedor-pregunta {
+    padding: 1rem;
+    background: var(--crombie-gradient-3);
+    border-radius: 0.5rem;
+}
+
+.texto-pregunta {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: white;
+    text-align: center;
+    /* text-balance no es CSS estándar, se usa line-height para legibilidad */
+    line-height: 1.4;
+}
+
+.contenedor-opciones {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+}
+
+/* Media Query para el diseño responsivo (md:grid-cols-2) */
+@media (min-width: 768px) {
+    .contenedor-opciones {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Botones de Opción */
+.boton-opcion {
+    padding: 1rem;
+    height: auto;
+    text-align: left;
+    transition: all 0.2s;
+    width: 100%;
+    border: 1px solid var(--color-border);
+    border-radius: 0.375rem;
+    cursor: pointer;
+    background-color: transparent;
+    color: var(--color-foreground);
+    display: flex;
+    align-items: flex-start;
+}
+
+.boton-opcion:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.letra-opcion {
+    font-weight: 500;
+}
+
+.texto-opcion {
+    margin-left: 0.5rem;
+    line-height: 1.5;
+}
+
+/* Efecto hover (reemplazo de hover:bg-crombie-gradient-1) */
+.opcion-normal:hover {
+    background: var(--crombie-gradient-1);
+    color: white;
+    border-color: transparent;
+}
+
+/* Clases de estado dinámico */
+.opcion-correcta-seleccionada {
+    background-color: var(--color-success);
+    color: white;
+    border-color: var(--color-success);
+}
+
+.opcion-incorrecta-seleccionada {
+    background-color: var(--color-error);
+    color: white;
+    border-color: var(--color-error);
+}
+
+/*.opcion-correcta-no-seleccionada {
+    /* Muestra la correcta cuando se selecciona una incorrecta 
+    background-color: var(--color-success);
+    color: white;
+    border-color: var(--color-success);
+}
+
+
+/* Resultado Final */
+.resultado-final {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.mensaje-resultado {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.texto-correcto {
+    color: var(--color-success);
+}
+
+.texto-incorrecto {
+    color: var(--color-error);
+}
+
+.texto-progreso {
+    color: var(--color-muted-foreground);
+}
+
+/* ================================================= */
+/* ESTADO DE INICIO (BOTÓN)             */
+/* ================================================= */
+
+.inicio-estado {
+    text-align: center;
+}
+
+.boton-iniciar {
+    background: var(--crombie-gradient-2);
+    color: white;
+    font-weight: bold;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.375rem;
+    transition: opacity 0.2s;
+    border: none;
+    cursor: pointer;
+}
+
+.boton-iniciar:hover {
+    opacity: 0.9;
+}
+
+/* ================================================= */
+/* INDICADOR DE PROGRESO                */
+/* ================================================= */
+
+.card-progreso {
+    padding: 1rem;
+    background-color: var(--color-card);
+    border: 1px solid var(--color-border);
+    border-radius: 0.5rem;
+}
+
+.contenido-progreso {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.info-progreso {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.875rem;
+    color: var(--color-muted-foreground);
+}
+
+.barra-progreso-bg {
+    width: 100%;
+    background-color: #4a5a75; /* Color neutro para el fondo de la barra */
+    border-radius: 9999px;
+    height: 0.5rem;
+}
+
+.barra-progreso-fill {
+    background: var(--crombie-gradient-1);
+    height: 0.5rem;
+    border-radius: 9999px;
+    transition: width 0.5s;
+}
