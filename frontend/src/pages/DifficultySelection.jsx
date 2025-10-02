@@ -1,15 +1,20 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useGame } from '../contexto/gameContext.jsx'; // ¡Revisa la ruta!
 import './css/DifficultySelection.css';
 
 export default function DifficultySelection() {
   const navigate = useNavigate();
-  const [dificultad, setDificultad] = useState('');
+  const { setGameDifficulty } = useGame(); 
+
   const manejarSeleccion = (nivel) => {
     console.log("Dificultad seleccionada:", nivel);
-    setDificultad(nivel);
-    // Navegar al slot machine pasando la dificultad
-    navigate(`/registro/${nivel}`);
+    
+    // Guarda la dificultad en el Contexto
+    setGameDifficulty(nivel); 
+    
+    // Navega a la página de juego
+    navigate('/slot-juego'); // Usa la ruta final de tu componente SlotJuego
   };
 
   return (
