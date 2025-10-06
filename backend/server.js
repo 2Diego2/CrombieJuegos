@@ -1,46 +1,34 @@
 // server.js
 const express = require('express');
-const fs = require('fs');
-const path = require('path');
 const cors = require('cors');
+// Importa el archivo de rutas que crearemos a continuación
+const preguntasRoutes = require('./routes/preguntas');
 
-// Inicializa el servidor
 const app = express();
-const port = 5000; // Cambiar a 5000 para evitar conflictos con el frontend
+const puerto = 3000;
 
-app.use(cors()); // Permite las solicitudes CORS desde el frontend
-app.use(express.json()); // Para manejar JSON en las solicitudes
+// Configurar CORS para permitir peticiones desde tu frontend
+app.use(cors({
+  origin: "http://localhost:5173"
+}));
 
-app.get('/api/dificultad/:nivel', (req, res) => {
-  const { nivel } = req.params;
-  let mensaje = '';
+// Middleware para que Express pueda entender cuerpos de petición en formato JSON
+app.use(express.json());
 
-  if (nivel === 'facil');
-  if (nivel === 'intermedio');
-  if (nivel === 'dificil');
+// **Línea clave:** Todas las rutas definidas en preguntasRoutes comenzarán con /api
+app.use(preguntasRoutes);
 
-  res.json({ mensaje });
+// Middleware para manejar rutas no encontradas (404)
+app.use((req, res, next) => {
+  res.status(404).json({ error: 'Ruta no encontrada' });
 });
 
-
-// Ruta para manejar la selección de preguntas de acuerdo a la categoría y dificultad
-app.get('/api/preguntas/:categoria/:dificultad', (req, res) => {
-  const { categoria, dificultad } = req.params;
-
-  // Cargar el archivo JSON
-  const data = JSON.parse(fs.readFileSync(path.join(__dirname, 'data.json'), 'utf8'));
-
-  // Verificar si la categoría y dificultad existen
-  if (data.categorias[categoria] && data.categorias[categoria][dificultad]) {
-    res.json(data.categorias[categoria][dificultad]);
-  } else {
-    res.status(404).json({ mensaje: 'No se encontraron preguntas para esta categoría o dificultad.' });
-  }
+// Middleware para manejo de errores generales del servidor (500)
+app.use((err, req, res, next) => {
+  console.error('Error global del servidor:', err);
+  res.status(500).json({ error: 'Error interno del servidor' });
 });
 
-// Arranca el servidor
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`
-    );  
+app.listen(puerto, () => {
+  console.log(`✅ Servidor escuchando en http://localhost:${puerto}`);
 });
-

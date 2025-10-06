@@ -23,7 +23,13 @@ export default function Home() {
           className="gestor-button"
           onClick= {() => navigate()}
         >
-          gestor
+          Gestionar Preguntas
+        </button>
+        <button
+          className='gestor-button'
+          onClick={() => navigate("/GestorPremios")}
+        >
+          Gestionar Premios
         </button>
       </footer>
     </div>
