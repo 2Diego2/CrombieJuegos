@@ -34,6 +34,9 @@ function Ruleta() {
   const [preguntaActual, setPreguntaActual] = useState(null);
   const { width, height } = useWindowSize(); 
 
+  const ganarSonido = new Audio("/Ganaste.mp3");
+  const perderSonido = new Audio("/Loserrrrr.mp3");
+
   useEffect(() => {
     if (!dificultadElegida) {
       setFaseDelJuego("error");
@@ -84,11 +87,13 @@ function Ruleta() {
     } catch (error) {
       console.error('Error al registrar sorteo:', error);
     }
+      ganarSonido.play();
       setFaseDelJuego("ganasteSorteo");
       return;
     }
 
     if (categoria === "Perdiste") {
+      perderSonido.play();
       setFaseDelJuego("perdisteRonda");
       return;
     }
