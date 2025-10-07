@@ -11,6 +11,16 @@
             "Un servidor web"
           ],
           "respuesta_correcta": "2"
+        },
+        {  
+          "pregunta": "¿Qué significa CSS?",
+          "opciones": [
+            "Hojas de estilo en cascada",
+            "Clase de Servidor y Sintaxis",
+            "Lenguaje de script para el cliente",
+            "Sistema de seguridad de contenido"
+          ],
+          "respuesta_correcta": "1"
         }
       ],
       "medio": [

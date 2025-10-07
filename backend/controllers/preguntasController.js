@@ -280,6 +280,3 @@ exports.eliminarCategoria = async (req, res) => {
 //eliminar pregunta
 
 //Cambiar estado de visibilidad de categoria
-
-
-

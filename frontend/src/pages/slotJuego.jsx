@@ -1,79 +1,58 @@
-import React, { useState, useEffect } from "react";
+// src/views/slotJuego.jsx
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import "../pages/css/juego.css";   // ✅ Import del CSS puro
-
-const questions = [
-  {
-    question: "¿Cuál es el lenguaje de programación más popular para desarrollo web frontend?",
-    options: ["Python", "JavaScript", "Java", "C++"],
-    correctAnswer: 1,
-  },
-  {
-    question: "¿Qué significa CSS?",
-    options: ["Computer Style Sheets", "Cascading Style Sheets", "Creative Style System", "Code Style Structure"],
-    correctAnswer: 1,
-  },
-  {
-    question: "¿Cuál es el protocolo estándar para transferir páginas web?",
-    options: ["FTP", "SMTP", "HTTP", "TCP"],
-    correctAnswer: 2,
-  },
-  {
-    question: "¿Qué es React?",
-    options: ["Una base de datos", "Una librería de JavaScript", "Un servidor web", "Un lenguaje de programación"],
-    correctAnswer: 1,
-  },
-  {
-    question: "¿Cuál es la extensión de archivo para TypeScript?",
-    options: [".js", ".ts", ".jsx", ".tsx"],
-    correctAnswer: 1,
-  },
-  {
-    question: "¿Qué significa API?",
-    options: [
-      "Application Programming Interface",
-      "Advanced Programming Integration",
-      "Automated Program Interaction",
-      "Application Process Integration",
-    ],
-    correctAnswer: 0,
-  },
-  {
-    question: "¿Cuál es el puerto por defecto para HTTP?",
-    options: ["443", "21", "80", "22"],
-    correctAnswer: 2,
-  },
-  {
-    question: "¿Qué es Node.js?",
-    options: [
-      "Un framework de CSS",
-      "Un entorno de ejecución de JavaScript",
-      "Una base de datos",
-      "Un editor de código",
-    ],
-    correctAnswer: 1,
-  },
-];
+import { useGame } from "../contexto/gameContext.jsx";
+import "./css/slotJuego.css";
 
 export default function QuestionSlotMachine({ onQuestionComplete, correctAnswers }) {
+  // 1. DECLARACIÓN DE TODOS LOS HOOKS (Incondicionalmente)
+  const { difficulty } = useGame();
   const navigate = useNavigate();
 
+  // 📦 Estados principales
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [isSpinning, setIsSpinning] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState(null);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [showResult, setShowResult] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
-  const [spinningQuestions, setSpinningQuestions] = useState([]);
+  const [spinningQuestions, setSpinningQuestions] = useState(["", "", ""]);
+  const [hasStarted, setHasStarted] = useState(false);
+  const [usedQuestions, setUsedQuestions] = useState([]);
+  const [localCorrectCount, setLocalCorrectCount] = useState(0); // 🆕 Estado local
 
-  const startSlotMachine = () => {
-    if (isSpinning) return;
+  // ⏱ Referencia para el intervalo
+  const spinIntervalRef = useRef(null);
 
+  // 🧩 Lógica de preparación
+  const dificultadNormalizada =
+    difficulty === "intermedio" ? "medio" : difficulty || "facil";
+  const categoriaSeleccionada = "Frontend";
+
+  // 🎯 Calculamos las preguntas disponibles (useMemo para estabilidad)
+  const questions = useMemo(() => {
+    return (
+      data?.categorias?.[categoriaSeleccionada]?.[dificultadNormalizada]?.map((q) => ({
+        question: q.pregunta,
+        options: q.opciones,
+        correctAnswer: parseInt(q.respuesta_correcta, 10) - 1,
+      })) || []
+    );
+  }, [data, dificultadNormalizada, categoriaSeleccionada]);
+
+  // 🎰 Inicia la animación del slot (useCallback)
+  const startSlotMachine = useCallback(() => {
+    if (isSpinning || questions.length === 0) return;
+
+    setHasStarted(true);
     setIsSpinning(true);
     setCurrentQuestion(null);
     setSelectedAnswer(null);
     setShowResult(false);
 
-    const spinInterval = setInterval(() => {
+    // Lógica del giro
+    spinIntervalRef.current = setInterval(() => {
       const randomQuestions = Array.from({ length: 3 }, () => {
         const randomIndex = Math.floor(Math.random() * questions.length);
         return questions[randomIndex].question;
@@ -81,15 +60,66 @@ export default function QuestionSlotMachine({ onQuestionComplete, correctAnswers
       setSpinningQuestions(randomQuestions);
     }, 100);
 
+    // Detiene el giro y selecciona la pregunta final (2 segundos después)
     setTimeout(() => {
-      clearInterval(spinInterval);
-      const randomIndex = Math.floor(Math.random() * questions.length);
-      setCurrentQuestion(questions[randomIndex]);
+      clearInterval(spinIntervalRef.current);
       setIsSpinning(false);
-      setSpinningQuestions([]);
-    }, 2000);
-  };
 
+      // Seleccionar una pregunta que NO se haya usado
+      let randomIndex;
+      let finalQuestion;
+      let attempts = 0;
+      const maxAttempts = questions.length * 2;
+
+      do {
+        randomIndex = Math.floor(Math.random() * questions.length);
+        finalQuestion = questions[randomIndex];
+        attempts++;
+      } while (
+        usedQuestions.includes(finalQuestion.question) && 
+        attempts < maxAttempts
+      );
+
+      setCurrentQuestion(finalQuestion);
+      setUsedQuestions(prev => [...prev, finalQuestion.question]);
+
+      setSpinningQuestions([
+        "Pregunta final seleccionada...",
+        finalQuestion.question,
+        "¡A responder!",
+      ]);
+    }, 2000);
+  }, [isSpinning, questions, usedQuestions]);
+
+  // 🔹 useEffect 1: Fetch de datos
+  useEffect(() => {
+    const fetchPreguntas = async () => {
+      try {
+        const res = await fetch("http://localhost:3000/api/preguntas");
+        const json = await res.json();
+        setData(json); 
+      } catch (err) {
+        console.error("Error al obtener preguntas:", err);
+        setData(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPreguntas();
+  }, []);
+
+  // 🎬 useEffect 2: Lanza la máquina automáticamente al montar
+  useEffect(() => {
+    if (!loading && questions.length > 0 && !hasStarted) {
+      const timer = setTimeout(() => {
+        startSlotMachine();
+      }, 100);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [loading, questions.length, hasStarted, startSlotMachine]);
+  
+  // 🧠 Maneja selección de respuestas
   const handleAnswerSelect = (answerIndex) => {
     if (selectedAnswer !== null || !currentQuestion) return;
 
@@ -98,37 +128,106 @@ export default function QuestionSlotMachine({ onQuestionComplete, correctAnswers
     setIsCorrect(correct);
     setShowResult(true);
 
+    console.log("Respuesta:", correct ? "Correcta" : "Incorrecta"); // 🆕 Debug
+
+    // Espera 2 segundos y toma acción
     setTimeout(() => {
-      onQuestionComplete(correct);
-      if (correct && correctAnswers + 1 === 3) {
-        navigate("/ganaste"); // 🚀 ejemplo de navegación al ganar
+      if (correct) {
+        // ✅ Respuesta correcta
+        const newCorrectCount = localCorrectCount + 1;
+        setLocalCorrectCount(newCorrectCount);
+        
+        console.log(`Respuestas correctas: ${newCorrectCount}/3`); // 🆕 Debug
+        
+        // Notificar al padre (si existe la función)
+        if (onQuestionComplete) {
+          onQuestionComplete(true);
+        }
+        
+        if (newCorrectCount === 3) {
+          // 🎉 Ganó el juego
+          console.log("¡GANASTE! Navegando a /ganaste"); // 🆕 Debug
+          setTimeout(() => {
+            navigate("/ganaste");
+          }, 1000);
+        } else {
+          // 🔄 Continuar con otra pregunta
+          console.log("Iniciando nueva pregunta..."); // 🆕 Debug
+          setTimeout(() => {
+            startSlotMachine();
+          }, 1000);
+        }
+      } else {
+        // ❌ Respuesta incorrecta - Perdió
+        console.log("Respuesta incorrecta. Navegando a /perdiste"); // 🆕 Debug
+        
+        // Notificar al padre (si existe la función)
+        if (onQuestionComplete) {
+          onQuestionComplete(false);
+        }
+        
+        setTimeout(() => {
+          navigate("/perdiste");
+        }, 2000);
       }
     }, 2000);
   };
 
+  // 🧹 Limpieza al desmontar
   useEffect(() => {
-    startSlotMachine();
+    return () => {
+      if (spinIntervalRef.current) {
+        clearInterval(spinIntervalRef.current);
+      }
+    };
   }, []);
 
+  // 2. RENDERIZADO CONDICIONAL TEMPRANO (Carga y Error)
+  if (loading) {
+    return (
+      <div className="slot-container">
+        <div className="card">
+          <p>Cargando preguntas...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!data || questions.length === 0) {
+    return (
+      <div className="slot-container">
+        <div className="card">
+          <p>No hay suficientes preguntas disponibles para la dificultad seleccionada 😢</p>
+        </div>
+      </div>
+    );
+  }
+
+  // 3. RENDERIZADO PRINCIPAL
   return (
     <div className="slot-container">
-
       <div className="card">
         <h3>Slot Machine de Preguntas</h3>
 
         {isSpinning ? (
+          // RAMA 1: MODO GIRO (3 cajas grandes)
           <>
             <p className="loading">Seleccionando pregunta...</p>
-            <div className="spin-list">
-              {spinningQuestions.map((question, index) => (
-                <div key={index} className="spin-item">{question}</div>
+            <div className={`spin-list ${isSpinning ? "is-spinning" : ""}`}>
+              {spinningQuestions.map((text, index) => (
+                <div key={index} className="spin-item">
+                  <div className="spin-content">
+                    {text && <p className="spin-line">{text}</p>}
+                  </div>
+                </div>
               ))}
             </div>
           </>
         ) : currentQuestion ? (
+          // RAMA 2: MODO RESPUESTA (1 caja pequeña + 4 botones)
           <>
             <div className="question-box">
-              {currentQuestion.question}
+              <span>{currentQuestion.question}</span>
             </div>
 
             <div className="options">
@@ -138,8 +237,18 @@ export default function QuestionSlotMachine({ onQuestionComplete, correctAnswers
                   onClick={() => handleAnswerSelect(index)}
                   disabled={selectedAnswer !== null}
                   className={`option-btn
-                    ${selectedAnswer === index && index === currentQuestion.correctAnswer ? "correct" : ""}
-                    ${selectedAnswer === index && index !== currentQuestion.correctAnswer ? "incorrect" : ""}
+                    ${
+                      selectedAnswer === index &&
+                      index === currentQuestion.correctAnswer
+                        ? "correct"
+                        : ""
+                    }
+                    ${
+                      selectedAnswer === index &&
+                      index !== currentQuestion.correctAnswer
+                        ? "incorrect"
+                        : ""
+                    }
                   `}
                 >
                   {String.fromCharCode(65 + index)}. {option}
@@ -149,28 +258,24 @@ export default function QuestionSlotMachine({ onQuestionComplete, correctAnswers
 
             {showResult && (
               <div className={`result ${isCorrect ? "correct" : "incorrect"}`}>
-                {isCorrect ? "¡Correcto!" : "Incorrecto"}
+                {isCorrect ? "¡Correcto! 🎉" : "Lo siento, perdiste 😢"}
               </div>
             )}
           </>
         ) : (
-          <button onClick={startSlotMachine} className="option-btn start-btn">
-            Iniciar Slot Machine
-          </button>
+          // RAMA 3: Estado inicial (se mostrará brevemente)
+          <p className="loading">Preparando pregunta...</p>
         )}
       </div>
 
-      {/* Progreso */}
       <div className="card">
         <div className="progress-bar">
           <div
             className="progress-fill"
-            style={{ width: `${(correctAnswers / 3) * 100}%` }}
+            style={{ width: `${(localCorrectCount / 3) * 100}%` }}
           />
         </div>
-        <p className="progress-text">
-          {correctAnswers}3 respuestas correctas
-        </p>
+        <p className="progress-text">{localCorrectCount}/3 respuestas correctas</p>
       </div>
     </div>
   );
