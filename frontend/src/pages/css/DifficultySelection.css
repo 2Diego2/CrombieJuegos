@@ -1,10 +1,32 @@
 /* difficultyselection.css */
 .contenedor-dificultad {
   display: flex;
+  gap: 40px;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   position: relative;
+  padding: 2.5rem;
+  background: transparent; /* fondo transparente */
+  width: 90%;
+  max-width: 600px; /* ancho moderado */
+  min-height: 600px;
+  margin: 2rem auto;
+  margin-top: 0px;
+  color: white;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.header-section {
+  margin-top: 0px;
+  display: flex;
+  justify-content: center;
+  padding-top: 60px;
+
+}
+
+.header-img {
+  width: 200px;
+  height: auto;
 }
 
 .h1 {

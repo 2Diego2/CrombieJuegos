@@ -1,3 +1,31 @@
+.dashboard-container {
+  display: flex;
+  gap: 40px;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  padding: 2.5rem;
+  background: transparent; /* fondo transparente */
+  width: 90%;
+  max-width: 600px; /* ancho moderado */
+  min-height: 600px;
+  margin: 2rem auto;
+  margin-top: 0px;
+  color: white;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.cro{
+  display: flex;
+  justify-content: center;
+  padding-top: 60px;
+}
+
+.cropped2-img{
+  width: 200px;
+  height: auto;
+}
+
 .dashboard-logo {
   margin: 70px;
   margin-top: -75px;
