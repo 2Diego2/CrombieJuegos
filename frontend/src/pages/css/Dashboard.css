@@ -115,7 +115,7 @@
 
 /* Botón de "Continuar" */
 .continuar-button {
-  padding: 14px 0;
+  padding: 14px 10px;
   font-size: 18px;
   font-weight: 700;
   color: white;
@@ -158,8 +158,11 @@
   }
 
   .continuar-button {
-    font-size: 16px;
-    padding: 12px 0;
+    font-size: 14px;
+    padding: 12px 8px;
+  }
+  .no-premios-alert h2{
+    font-size: 1.3rem !important;
   }
 }
 

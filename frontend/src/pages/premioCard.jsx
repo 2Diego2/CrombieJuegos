@@ -1,14 +1,15 @@
 // PaginaPremio.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useGame } from '../components/contexto/gameContext.jsx'; 
 import './css/premioCard.css';
 
 export default function PaginaPremio() {
   const [premio, setPremio] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [noPremios, setNoPremios] = useState(false);
   const navigate = useNavigate();
+  const { difficulty } = useGame(); 
 
   useEffect(() => {
     obtenerYAsignarPremio();
@@ -25,16 +26,18 @@ export default function PaginaPremio() {
       const premios = await response.json();
       
       if (!premios || premios.length === 0) {
-        setNoPremios(true);
         setLoading(false);
         return;
       }
 
       // Seleccionar premio aleatorio
       const premioAleatorio = premios[Math.floor(Math.random() * premios.length)];
+
+      //codificar el nombre del premio para la URL
+      const nombreCodificado = encodeURIComponent(premioAleatorio.nombre);
       
       // Descontar stock
-      const descontarResponse = await fetch(`/api/premios/stock/${premioAleatorio.nombre}`, {
+      const descontarResponse = await fetch(`/api/premios/stock/${nombreCodificado}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
@@ -58,9 +61,11 @@ export default function PaginaPremio() {
     return `/api/premios/imagen/${driveId}`;
   };
 
-  const handleGoHome = () => {
-    navigate('/'); // Redirige a la ruta raíz (Home)
+  
+  const handlePlayAgain = () => {
+    navigate(`/registro/${difficulty}`);
   };
+
 
   if (loading) {
     return (
@@ -70,21 +75,6 @@ export default function PaginaPremio() {
     );
   }
 
-  if (noPremios) {
-    return (
-      <div className="premio-card-container">
-        <div className="no-premios-content">
-          <div className="no-premios-message">
-            ⚠️ ¡Se agotaron los premios!
-          </div>
-          <button className="home-button" onClick={handleGoHome}>
-            Volver al Inicio
-          </button>
-        </div>
-        
-      </div>
-    );
-  }
   if (error) {
     return (
       <div className="premio-card-container">
@@ -106,7 +96,7 @@ export default function PaginaPremio() {
           <img 
             src={getImageUrl(premio.imagen)} 
             alt={premio.nombre}
-            className="premio-imagen"
+            className={`premio-imagen ${premio.nombre === 'Vaso térmico' ? 'size-small' : ''}`}
           />
         ) : (
           <div className="premio-placeholder">
@@ -118,6 +108,15 @@ export default function PaginaPremio() {
       {/* Logo Crombie */}
     
       <img className="crombie-logo" src="/cropped2.svg" alt="Logo" />
+
+      <div className="volver-a-jugar-content">
+        <button 
+            className="volver-a-jugar-btn" 
+            onClick={handlePlayAgain}>
+            Volver a jugar
+        </button>
+      </div>
+
     </div>
   );
 }
