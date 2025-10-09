@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import "./css/Dashboard.css";
 import { useNavigate, useParams } from "react-router-dom";
+import { GiFastBackwardButton } from "react-icons/gi";
+
 
 function Dashboard() {
   const [nombre, setNombre] = useState("");
@@ -92,9 +94,18 @@ function Dashboard() {
       </div>
     );
   }
+    
+  const manejarVolver = () => {
+    navigate(-1); // Vuelve a la página anterior
+  };
 
   return (
+    
     <div className="dashboard-container">
+          <button className="back-arrow" onClick={manejarVolver}>
+              <GiFastBackwardButton />
+            </button>
+            
       <div className="cro">
         <img className="cropped2-img" src="/cropped2.svg" alt="Logo" />
       </div>
@@ -148,7 +159,7 @@ function Dashboard() {
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <h2>Términos y Condiciones</h2>
             <p>
-              Lorem ipsum dolor sit amet consectetur adipiscing elit...
+              Crombie se compromete a proteger y respetar tu privacidad, y solo usaremos tu información personal para administrar tu cuenta y proporcionar información sobre contenidos que puedan interesarte.
             </p>
             <button className="close-button" onClick={() => setShowModal(false)}>
               Cerrar
