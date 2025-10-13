@@ -25,6 +25,11 @@ function GestorPreguntas() {
 
   // Estado para edición de una pregunta existente
   const [preguntaEditando, setPreguntaEditando] = useState(null);
+
+  //Estado para eliminar pregunta
+const [modalEliminarPreguntaOpen, setModalEliminarPreguntaOpen] = useState(false);
+const [preguntaAEliminar, setPreguntaAEliminar] = useState(null);
+
   
   // Estado para el formulario (sirve para agregar y editar)
   const [formPregunta, setFormPregunta] = useState({
@@ -34,7 +39,7 @@ function GestorPreguntas() {
     dificultad: 'facil'
   });
 
-  // ⭐ NUEVO: Estado para el modal de confirmación de eliminación
+  // Estado para el modal de confirmación de eliminación
   const [modalEliminarOpen, setModalEliminarOpen] = useState(false);
   const [categoriaAEliminar, setCategoriaAEliminar] = useState(null);
 
@@ -76,13 +81,13 @@ function GestorPreguntas() {
       .catch(err => console.error("Error al cambiar visibilidad:", err));
   };
 
-  // ⭐ MODIFICADO: Abrir modal de confirmación
+  // Abrir modal de confirmación
   const solicitarEliminarCategoria = (nombre) => {
     setCategoriaAEliminar(nombre);
     setModalEliminarOpen(true);
   };
 
-  // ⭐ NUEVO: Confirmar eliminación de categoría
+  // Confirmar eliminación de categoría
   const confirmarEliminarCategoria = () => {
     if (categoriaAEliminar) {
       fetch(`/api/categorias/${categoriaAEliminar}`, { method: "DELETE" })
@@ -96,7 +101,7 @@ function GestorPreguntas() {
     }
   };
 
-  // ⭐ NUEVO: Cancelar eliminación
+  // Cancelar eliminación
   const cancelarEliminarCategoria = () => {
     setModalEliminarOpen(false);
     setCategoriaAEliminar(null);
@@ -213,27 +218,41 @@ function GestorPreguntas() {
       });
   };
 
-  const borrarPregunta = (categoria, dificultad, index) => {
-    if (window.confirm('¿Estás seguro de que quieres eliminar esta pregunta?')) {
-      fetch(`/api/preguntas/${categoria}/${dificultad}/${index}`, {
-        method: 'DELETE',
-      })
-        .then(res => {
-          if (!res.ok) {
-            throw new Error('Error al eliminar la pregunta');
-          }
-          return res.json();
-        })
-        .then(() => {
-          console.log('Pregunta eliminada con éxito');
-          fetchPreguntas();
-        })
-        .catch(err => {
-          console.error('Error en el proceso de eliminación:', err);
-          alert(err.message);
-        });
-    }
-  };
+  const solicitarEliminarPregunta = (categoria, dificultad, index) => {
+  setPreguntaAEliminar({ categoria, dificultad, index });
+  setModalEliminarPreguntaOpen(true);
+};
+  
+{/* filepath: c:\Users\diego\OneDrive\Desktop\CrombieJuegos\frontend\src\pages\GestorPreguntas\gestorPreguntas.jsx */}
+const confirmarEliminarPregunta = async () => {
+  try {
+    const { categoria, dificultad, index } = preguntaAEliminar;
+
+    // Crear una copia del estado de preguntas
+    const nuevasPreguntas = { ...preguntas };
+
+    // Eliminar la pregunta del array
+    nuevasPreguntas[categoria][dificultad].splice(index, 1);
+
+    // Actualizar el estado con las preguntas modificadas
+    setPreguntas(nuevasPreguntas);
+
+    setModalEliminarPreguntaOpen(false);
+    setPreguntaAEliminar(null);
+  } catch (error) {
+    console.error("Error al eliminar la pregunta:", error);
+    alert("Error al eliminar la pregunta");
+  }
+};
+
+const cancelarEliminarPregunta = () => {
+  setModalEliminarPreguntaOpen(false);
+  setPreguntaAEliminar(null);
+};
+
+ const borrarPregunta = (categoria, dificultad, index) => {
+  solicitarEliminarPregunta(categoria, dificultad, index);
+};
 
   return (
     <div>
@@ -301,8 +320,8 @@ function GestorPreguntas() {
           )}
         </div>
       </div>
-
-      {/* ⭐ NUEVO: Modal de confirmación de eliminación */}
+      
+      {/* Modal de confirmación de eliminación */}
       {modalEliminarOpen && (
         <div className="modal modal-confirmacion">
           <div className="modal-content modal-confirmacion-content">
@@ -318,22 +337,56 @@ function GestorPreguntas() {
               Esta acción no se puede deshacer.
             </p>
             <div className="modal-confirmacion-botones">
-              <button
-                className="btn-cancelar"
-                onClick={cancelarEliminarCategoria}
-              >
-                Cancelar
-              </button>
-              <button
+             <button
                 className="btn-eliminar"
                 onClick={confirmarEliminarCategoria}
               >
                 Sí, eliminar
               </button>
+
+                <button
+                className="btn-cancelar"
+                onClick={cancelarEliminarCategoria}
+              >
+                Cancelar
+              </button>
             </div>
           </div>
         </div>
       )}
+      {/*Modal confirmacion de eliminacion de preguntas */}
+      {modalEliminarPreguntaOpen && (
+  <div className="modal modal-confirmacion">
+    <div className="modal-content modal-confirmacion-content">
+      <div className="modal-confirmacion-header">
+        <FaTrash className="modal-confirmacion-icon" />
+        <h3>¿Eliminar pregunta?</h3>
+      </div>
+      <p className="modal-confirmacion-texto">
+        ¿Estás seguro de que quieres eliminar esta pregunta?
+      </p>
+      <p className="modal-confirmacion-advertencia">
+        Esta acción no se puede deshacer.
+      </p>
+      <div className="modal-confirmacion-botones">
+        <button
+          className="btn-eliminar"
+          onClick={confirmarEliminarPregunta}
+        >
+          Sí, eliminar
+        </button>
+        <button
+          className="btn-cancelar"
+          onClick={cancelarEliminarPregunta}
+        >
+          Cancelar
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+
 
       {/* Modal de ver/editar preguntas */}
       {modalOpen && categoriaSeleccionada && (
