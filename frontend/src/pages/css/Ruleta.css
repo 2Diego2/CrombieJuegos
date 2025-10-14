@@ -6,7 +6,6 @@
     justify-content: center;
     align-items: center;
     position: relative;
-    
     /* 1. Dimensionamiento Responsive (Escritorio) */
     /* El SVG ocupará el 100% de este contenedor */
     width: 90vw;
