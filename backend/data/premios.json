@@ -1,34 +1,24 @@
 {
   "premios": {
-    "buzo": {
+    "Botella": {
       "activo": true,
-      "cantidad": 5,
-      "imagen": null
+      "cantidad": 1,
+      "imagen": "1n1zSHrG_Ujs_DUYz2x_8YWjh5N3ZSxEq"
     },
-    "remera": {
-      "activo": false,
-      "cantidad": 10,
-      "imagen": null
-    },
-    "botella": {
+    "Remera + bolso": {
       "activo": true,
-      "cantidad": 15,
-      "imagen": null
+      "cantidad": 0,
+      "imagen": "1q_I80Du_qvTGN5kHu1LwuHVTzLvdSslV"
     },
-    "vaso_termico": {
-      "activo": true,
-      "cantidad": 20,
-      "imagen": null
-    },
-    "La": {
+    "Buzo": {
       "activo": false,
       "cantidad": 0,
-      "imagen": null
+      "imagen": "1wKoTdKcQXuQ7fNfCtQ72TDXXXV9ZYh71"
     },
-    "remeruli": {
+    "Vaso térmico": {
       "activo": true,
-      "cantidad": 8,
-      "imagen": null
+      "cantidad": 0,
+      "imagen": "1Y-de0CxhGLMBsRz_EeiLcBgIuKfVR678"
     }
   }
 }

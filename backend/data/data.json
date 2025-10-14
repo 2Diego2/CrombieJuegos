@@ -1,84 +1,5 @@
 {
   "categorias": {
-    "Backend": {
-      "facil": [
-        {
-          "pregunta": "¿Qué es una API RESTful?",
-          "opciones": [
-            "Una API que usa SOAP",
-            "Una API que sigue el estilo arquitectónico REST",
-            "Una API basada en WebSockets",
-            "Una API que se comunica mediante sockets"
-          ],
-          "respuesta_correcta": "2"
-        },
-        {
-          "pregunta": "¿Qué significa SQL?",
-          "opciones": [
-            "Structured Query Language",
-            "Simple Question Logic",
-            "Standard Query List",
-            "Server Query Link"
-          ],
-          "respuesta_correcta": 1
-        }
-      ],
-      "medio": [
-        {
-          "pregunta": "¿Qué es un servidor RESTful?",
-          "opciones": [
-            "Un servidor que usa SOAP",
-            "Un servidor basado en protocolos como HTTP",
-            "Un servidor que usa JavaScript",
-            "Un servidor que almacena bases de datos"
-          ],
-          "respuesta_correcta": "Un servidor basado en protocolos como HTTP"
-        },
-        {
-          "pregunta": "¿Cuál es el lenguaje más usado para desarrollo de aplicaciones backend?",
-          "opciones": [
-            "Python",
-            "JavaScript",
-            "Ruby",
-            "Java"
-          ],
-          "respuesta_correcta": "2"
-        },
-        {
-          "pregunta": "¿Qué es un servidor RESTful?",
-          "opciones": [
-            "Un servidor basado en protocolos como HTTP",
-            "Un servidor que usa SOAP",
-            "Un servidor que usa JavaScript",
-            "Un servidor que almacena bases de datos"
-          ],
-          "respuesta_correcta": "1"
-        }
-      ],
-      "dificil": [
-        {
-          "pregunta": "¿Qué es una base de datos NoSQL?",
-          "opciones": [
-            "Una base de datos relacional",
-            "Una base de datos que no usa SQL",
-            "Una base de datos basada en archivos",
-            "Una base de datos que solo almacena texto"
-          ],
-          "respuesta_correcta": "2"
-        },
-        {
-          "pregunta": "¿Qué es un microservicio?",
-          "opciones": [
-            "Un servicio que responde a una solicitud",
-            "Un componente que realiza una función pequeña dentro de un sistema",
-            "Un servidor web",
-            "Un servicio de base de datos"
-          ],
-          "respuesta_correcta": "2"
-        }
-      ],
-      "visible": false
-    },
     "Frontend": {
       "facil": [
         {
@@ -92,14 +13,34 @@
           "respuesta_correcta": "2"
         },
         {
-          "pregunta": "¿Qué hace CSS?",
+          "pregunta": "¿Qué es CSS?",
           "opciones": [
-            "Diseña la estructura de la página",
-            "Agrega interactividad a la página",
-            "Estiliza y da formato a la página",
-            "Gestiona bases de datos"
+            "Un lenguaje de programación",
+            "Un lenguaje de marcado",
+            "Una hoja de estilos",
+            "Un servidor web"
           ],
           "respuesta_correcta": "3"
+        },
+        {
+          "pregunta": "¿Qué es JavaScript?",
+          "opciones": [
+            "Un lenguaje de programación",
+            "Un lenguaje de marcado",
+            "Una hoja de estilos",
+            "Un servidor web"
+          ],
+          "respuesta_correcta": "1"
+        },
+        {
+          "pregunta": "¿Qué etiqueta se usa para insertar una imagen en HTML?",
+          "opciones": [
+            "<img>",
+            "<image>",
+            "<src>",
+            "<picture>"
+          ],
+          "respuesta_correcta": "1"
         }
       ],
       "medio": [
@@ -146,7 +87,7 @@
           "respuesta_correcta": "1"
         }
       ],
-      "visible": false
+      "visible": true
     },
     "Crombie": {
       "facil": [
@@ -159,6 +100,46 @@
             "Argentina"
           ],
           "respuesta_correcta": "4"
+        },
+        {
+          "pregunta": "¿Qué tipo de productos fabrica Crombie?",
+          "opciones": [
+            "Ropa de lujo",
+            "Electrónica",
+            "Automóviles",
+            "Alimentos"
+          ],
+          "respuesta_correcta": "1"
+        },
+        {
+          "pregunta": "¿Cuál es el eslogan de Crombie?",
+          "opciones": [
+            "Elegancia y estilo",
+            "Calidad y tradición",
+            "Moda para todos",
+            "Innovación y diseño"
+          ],
+          "respuesta_correcta": "2"
+        },
+        {
+          "pregunta": "¿Qué tipo de prendas es más conocido Crombie?",
+          "opciones": [
+            "Trajes y abrigos",
+            "Ropa deportiva",
+            "Ropa casual",
+            "Ropa de trabajo"
+          ],
+          "respuesta_correcta": "1"
+        },
+        {
+          "pregunta": "¿En qué ciudad se fundó Crombie?",
+          "opciones": [
+            "Londres",
+            "Edimburgo",
+            "Manchester",
+            "Birmingham"
+          ],
+          "respuesta_correcta": "2"
         }
       ],
       "medio": [
@@ -205,7 +186,54 @@
           "respuesta_correcta": "2"
         }
       ],
-      "visible": false
+      "visible": true
+    },
+    "Backend": {
+      "visible": true,
+      "facil": [
+        {
+          "pregunta": "Que es tal",
+          "opciones": [
+            "1",
+            "2",
+            "7",
+            "4"
+          ],
+          "respuesta_correcta": 2
+        },
+        {
+          "pregunta": "¿Qué es una API?",
+          "opciones": [
+            "Una base de datos",
+            "Un servidor web",
+            "Una interfaz de programación de aplicaciones",
+            "Un lenguaje de programación"
+          ],
+          "respuesta_correcta": "3"
+        },
+        {
+          "pregunta": "¿Qué es Node.js?",
+          "opciones": [
+            "Un lenguaje de programación",
+            "Un entorno de ejecución para JavaScript en el servidor",
+            "Un framework de CSS",
+            "Una base de datos"
+          ],
+          "respuesta_correcta": "2"
+        },
+        {
+          "pregunta": "¿Qué es una base de datos?",
+          "opciones": [
+            "Un sistema para almacenar y gestionar datos",
+            "Un lenguaje de programación",
+            "Un servidor web",
+            "Una interfaz de usuario"
+          ],
+          "respuesta_correcta": "1"
+        }
+      ],
+      "medio": [],
+      "dificil": []
     }
   }
 }

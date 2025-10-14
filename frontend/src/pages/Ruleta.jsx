@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import Confetti from 'react-confetti';
 import { useWindowSize } from 'react-use';
 import JuegoRuleta from "../components/juegoRuleta";
-import PreguntaCard from "../components/preguntaCard";
+import SlotJuego from "./slotJuego";
 import "./css/Ruleta.css";
 
 const mezclarCategorias = (array) => {
@@ -59,6 +59,14 @@ function Ruleta() {
     };
     fetchData();
   }, [dificultadElegida]);
+
+   useEffect(() => {
+    if (faseDelJuego === "preguntasCard") {
+     // ✅ CORRECTO: La navegación se ejecuta AHORA después del renderizado.
+      navigate("/slot-juego");
+    } 
+    // El efecto se dispara solo cuando 'faseDelJuego' cambia.
+  }, [faseDelJuego, navigate]); 
 
   if (faseDelJuego === "cargando") return <div className="loading-screen">Cargando datos del juego...</div>;
   if (faseDelJuego === "error") return <div className="error-screen">Ocurrió un error al cargar los datos.</div>;
@@ -121,7 +129,7 @@ function Ruleta() {
       )}
 
       {faseDelJuego === "preguntasCard" && (
-        <PreguntaCard pregunta={preguntaActual} />
+        <div className="redireccionando">Redireccionando al juego...</div>
       )}
 
       {/* FASE: Ganaste Sorteo (Tarjeta de Mensaje) */}

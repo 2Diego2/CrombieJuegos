@@ -54,4 +54,7 @@ router.patch('/api/premios/cantidad/:nombre/:cantidad', asyncHandler(premiosCont
 //MOSTRAR LOS PREMIOS ACTIVOS (estado=true)  //FUNCIONAAAAAA
 router.get('/api/premios/activos', asyncHandler(premiosController.listarPremiosActivos));
 
+// OBTENER IMAGEN DEL PREMIO (desde drive)  //FUNCIONAAAAAA
+router.get('/api/premios/imagen/:driveId', asyncHandler(premiosController.obtenerImagenPremio));
+
 module.exports = router;

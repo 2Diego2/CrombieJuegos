@@ -5,7 +5,7 @@
 //activa - desactiva premios
 
 const path = require('path');
-const {leerPremios, guardarPremios, obtenerPremiosActivos} = require('../utils/fileHandler');
+const {leerPremios, guardarPremios, obtenerPremiosActivos, descontarStockAtomico} = require('../utils/fileHandler');
 const googleDrive = require('../utils/googleHandler')
 const { google } = require('googleapis');
 
@@ -235,28 +235,25 @@ exports.descontarStock = async (req, res) => {
     const { nombre } = req.params;
 
     try {
-        const premiosData = await leerPremios();
-
-        if (!premiosData[nombre]) {
-            return res.status(404).json({ message: 'Premio no encontrado' });
-        }
-
-        const premio = premiosData[nombre];
-
-        if (premio.cantidad <= 0) {
-            return res.status(400).json({ message: 'Sin stock disponible' });
-        }
-
-        premio.cantidad -= 1;
-
-        await guardarPremios(premiosData);
+        // Uso la función ATÓMICA que maneja el bloqueo
+        const premioActualizado = await descontarStockAtomico(nombre);
 
         res.json({
             message: `Se descontó 1 unidad del premio '${nombre}'.`,
-            premio: { nombre, ...premio }
+            premio: premioActualizado
         });
+
     } catch (error) {
         console.error(error);
+        
+        // Mapear los errores específicos lanzados por la función atómica al código HTTP correcto
+        if (error.message === 'Premio no encontrado') {
+            return res.status(404).json({ message: 'Premio no encontrado' });
+        }
+        if (error.message === 'Sin stock disponible') {
+            return res.status(400).json({ message: 'Sin stock disponible' }); // Este es el 400
+        }
+
         res.status(500).json({ error: 'Error al descontar stock' });
     }
 };
@@ -302,4 +299,26 @@ exports.listarPremiosActivos = async (req, res) => {
         console.error(error);
         return res.status(500).json({ error: 'Error al obtener la lista de premios activos' });
     }
+}
+
+
+// Obtener imagen de premio por su ID de Drive
+exports.obtenerImagenPremio = async (req, res) => {
+  const { driveId } = req.params;
+  
+  try {
+    const driveService = await googleDrive.getDriveService();
+      
+    const response = await driveService.files.get(
+      { fileId: driveId, alt: 'media' },
+      { responseType: 'stream' }
+    );
+    
+    res.setHeader('Content-Type', 'image/jpeg');
+    response.data.pipe(res);
+    
+  } catch (error) {
+    console.error('Error al obtener imagen:', error);
+    res.status(404).send('Imagen no encontrada');
+  }
 }
