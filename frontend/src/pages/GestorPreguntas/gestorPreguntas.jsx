@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { FaEye, FaEyeSlash, FaTrash, FaEdit, FaPlus } from 'react-icons/fa';
+import { FaEye, FaEyeSlash, FaTrash, FaEdit,FaPlus } from 'react-icons/fa';
 import { FaQuestion } from "react-icons/fa6";
 import { GiFastBackwardButton } from "react-icons/gi";
+
 import './GestorPreguntas.css';
 import GradientText from './GradientText';
 
@@ -14,34 +15,24 @@ function GestorPreguntas() {
   const [modalOpen, setModalOpen] = useState(false);
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState(null);
 
-  // Estado para el modal de AGREGAR pregunta
+//Estado para el modal de AGREGAR pregunta
   const [modalAgregarOpen, setModalAgregarOpen] = useState(false);
 
-  // Estado para el modal de agregar categoría
+// Estado para el modal de agregar categoría ---
   const [modalAgregarCategoriaOpen, setModalAgregarCategoriaOpen] = useState(false);
 
-  // Estado para el nombre de la nueva categoría
+//Estado para el nombre de la nueva categoría ---
   const [nuevaCategoriaNombre, setNuevaCategoriaNombre] = useState('');
 
   // Estado para edición de una pregunta existente
-  const [preguntaEditando, setPreguntaEditando] = useState(null);
-
-  //Estado para eliminar pregunta
-const [modalEliminarPreguntaOpen, setModalEliminarPreguntaOpen] = useState(false);
-const [preguntaAEliminar, setPreguntaAEliminar] = useState(null);
-
-  
+  const [preguntaEditando, setPreguntaEditando] = useState(null); // { categoria, dificultad, index, data }
   // Estado para el formulario (sirve para agregar y editar)
   const [formPregunta, setFormPregunta] = useState({
     pregunta: "",
     opciones: ["", "", "", ""],
     respuesta_correcta: 1,
-    dificultad: 'facil'
+    dificultad: 'facil' // Añadimos dificultad por defecto
   });
-
-  // Estado para el modal de confirmación de eliminación
-  const [modalEliminarOpen, setModalEliminarOpen] = useState(false);
-  const [categoriaAEliminar, setCategoriaAEliminar] = useState(null);
 
   // cargar categorías
   const fetchCategorias = () => {
@@ -72,6 +63,24 @@ const [preguntaAEliminar, setPreguntaAEliminar] = useState(null);
     fetchPreguntas();
   }, []);
 
+  // Contar categorías visibles
+  const categoriasVisibles = categorias.filter(cat => cat.visible);
+  const tieneMinimoCategorias = categoriasVisibles.length === 3;
+
+  // Bloquear salida si no hay 3 visibles
+  useEffect(() => {
+    const handleBeforeUnload = (event) => {
+      if (!tieneMinimoCategorias) {
+        event.preventDefault();
+        event.returnValue = "Debes tener 3 categorías visibles antes de salir.";
+      }
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [tieneMinimoCategorias]);
+
   // toggle visibilidad
   const toggleVisible = (nombre, visible) => {
     fetch(`/api/categorias/${nombre}/visibilidad/${!visible}`, {
@@ -81,32 +90,17 @@ const [preguntaAEliminar, setPreguntaAEliminar] = useState(null);
       .catch(err => console.error("Error al cambiar visibilidad:", err));
   };
 
-  // Abrir modal de confirmación
-  const solicitarEliminarCategoria = (nombre) => {
-    setCategoriaAEliminar(nombre);
-    setModalEliminarOpen(true);
-  };
-
-  // Confirmar eliminación de categoría
-  const confirmarEliminarCategoria = () => {
-    if (categoriaAEliminar) {
-      fetch(`/api/categorias/${categoriaAEliminar}`, { method: "DELETE" })
+  // eliminar categoría
+    const eliminarCategoria = (nombre) => {
+    if (window.confirm(`¿Estás seguro de que quieres eliminar la categoría "${nombre}" y todas sus preguntas?`)) {
+      fetch(`/api/categorias/${nombre}`, { method: "DELETE" })
         .then(() => {
           fetchCategorias();
           fetchPreguntas();
-          setModalEliminarOpen(false);
-          setCategoriaAEliminar(null);
         })
         .catch(err => console.error("Error al eliminar categoría:", err));
     }
   };
-
-  // Cancelar eliminación
-  const cancelarEliminarCategoria = () => {
-    setModalEliminarOpen(false);
-    setCategoriaAEliminar(null);
-  };
-
   // guardar cambios
   const guardarPregunta = () => {
     const { categoria, dificultad, index } = preguntaEditando;
@@ -120,12 +114,14 @@ const [preguntaAEliminar, setPreguntaAEliminar] = useState(null);
       .then(data => {
         console.log("Pregunta actualizada:", data);
         fetchPreguntas();
-        setPreguntaEditando(null);
+        setPreguntaEditando(null); // cerrar editor
       })
       .catch(err => console.error("Error al guardar pregunta:", err));
   };
 
-  // Resetear el formulario a su estado inicial
+   
+   
+   // Resetear el formulario a su estado inicial
   const resetForm = () => {
     setFormPregunta({
       pregunta: '',
@@ -135,6 +131,7 @@ const [preguntaAEliminar, setPreguntaAEliminar] = useState(null);
     });
   };
 
+//
   const abrirModalAgregar = (categoria) => {
     resetForm();
     setCategoriaSeleccionada(categoria);
@@ -145,7 +142,9 @@ const [preguntaAEliminar, setPreguntaAEliminar] = useState(null);
     setModalAgregarOpen(false);
     setCategoriaSeleccionada(null);
   };
+  //
 
+    // abrir modal de edición de preguntas
   const abrirModal = (categoria) => {
     setCategoriaSeleccionada(categoria);
     setModalOpen(true);
@@ -156,9 +155,10 @@ const [preguntaAEliminar, setPreguntaAEliminar] = useState(null);
     setCategoriaSeleccionada(null);
     setPreguntaEditando(null);
   };
-
+//
+//Funciones para el modal de agregar categoría ---
   const abrirModalAgregarCategoria = () => {
-    setNuevaCategoriaNombre('');
+    setNuevaCategoriaNombre(''); // Limpia el input anterior
     setModalAgregarCategoriaOpen(true);
   };
 
@@ -166,9 +166,10 @@ const [preguntaAEliminar, setPreguntaAEliminar] = useState(null);
     setModalAgregarCategoriaOpen(false);
   };
 
-  // Agregar pregunta
-  const agregarPregunta = (e) => {
-    e.preventDefault();
+
+//Agregar pregunta
+   const agregarPregunta = (e) => {
+    e.preventDefault(); // Evita que el formulario recargue la página
     if (!categoriaSeleccionada) return;
 
     fetch('/api/agregarpregunta', {
@@ -179,11 +180,13 @@ const [preguntaAEliminar, setPreguntaAEliminar] = useState(null);
       .then(res => res.json())
       .then(() => {
         fetchPreguntas();
-        cerrarModalAgregar();
+        cerrarModalAgregar(); // Cierra el modal de agregar
       })
       .catch(err => console.error('Error al agregar pregunta:', err));
   };
 
+
+  // abrir formulario de edición de pregunta
   const abrirEditorPregunta = (categoria, dificultad, index, data) => {
     setPreguntaEditando({ categoria, dificultad, index });
     setFormPregunta({
@@ -193,7 +196,7 @@ const [preguntaAEliminar, setPreguntaAEliminar] = useState(null);
     });
   };
 
-  const agregarCategoria = (e) => {
+const agregarCategoria = (e) => {
     e.preventDefault();
     if (!nuevaCategoriaNombre.trim()) {
       alert('El nombre de la categoría no puede estar vacío.');
@@ -204,79 +207,73 @@ const [preguntaAEliminar, setPreguntaAEliminar] = useState(null);
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ categoria: nuevaCategoriaNombre }),
     })
+    .then(res => {
+      if (!res.ok) throw new Error('La categoría ya existe o hubo un error.');
+      return res.json();
+    })
+    .then(() => {
+      fetchCategorias(); // Actualiza la lista de categorías
+      cerrarModalAgregarCategoria(); // Cierra el modal
+    })
+    .catch(err => {
+      console.error('Error al agregar categoría:', err);
+      alert(err.message);
+    });
+  };
+
+  const borrarPregunta = (categoria, dificultad, index) => {
+    if (window.confirm('¿Estás seguro de que quieres eliminar esta pregunta?')) {
+      fetch(`/api/preguntas/${categoria}/${dificultad}/${index}`, {
+        method: 'DELETE',
+      })
       .then(res => {
-        if (!res.ok) throw new Error('La categoría ya existe o hubo un error.');
+        if (!res.ok) {
+          throw new Error('Error al eliminar la pregunta');
+        }
         return res.json();
       })
       .then(() => {
-        fetchCategorias();
-        cerrarModalAgregarCategoria();
+        console.log('Pregunta eliminada con éxito');
+        fetchPreguntas(); // Actualiza el estado de las preguntas
       })
       .catch(err => {
-        console.error('Error al agregar categoría:', err);
+        console.error('Error en el proceso de eliminación:', err);
         alert(err.message);
       });
+    }
   };
 
-  const solicitarEliminarPregunta = (categoria, dificultad, index) => {
-  setPreguntaAEliminar({ categoria, dificultad, index });
-  setModalEliminarPreguntaOpen(true);
-};
-  
-{/* filepath: c:\Users\diego\OneDrive\Desktop\CrombieJuegos\frontend\src\pages\GestorPreguntas\gestorPreguntas.jsx */}
-const confirmarEliminarPregunta = async () => {
-  try {
-    const { categoria, dificultad, index } = preguntaAEliminar;
 
-    // Crear una copia del estado de preguntas
-    const nuevasPreguntas = { ...preguntas };
-
-    // Eliminar la pregunta del array
-    nuevasPreguntas[categoria][dificultad].splice(index, 1);
-
-    // Actualizar el estado con las preguntas modificadas
-    setPreguntas(nuevasPreguntas);
-
-    setModalEliminarPreguntaOpen(false);
-    setPreguntaAEliminar(null);
-  } catch (error) {
-    console.error("Error al eliminar la pregunta:", error);
-    alert("Error al eliminar la pregunta");
-  }
-};
-
-const cancelarEliminarPregunta = () => {
-  setModalEliminarPreguntaOpen(false);
-  setPreguntaAEliminar(null);
-};
-
- const borrarPregunta = (categoria, dificultad, index) => {
-  solicitarEliminarPregunta(categoria, dificultad, index);
-};
 
   return (
     <div>
-      <div className="volver">
-        <a href="/">
-          <GiFastBackwardButton />
-        </a>
-      </div>
+     <div className="volver">
+      {tieneMinimoCategorias ? (
+    <a href="/">
+      <GiFastBackwardButton /> 
+    </a>
+    ) : (
+          <p style={{ color: "red", fontWeight: "bold", margin: "10px 0" }}>
+            Debes tener 3 categorías visibles para continuar.
+          </p>
+        )}
+  </div>
       <div className="nombre">
-        <GradientText animationSpeed={12}>
+         <GradientText animationSpeed={12}>
           Gestor de Preguntas
         </GradientText>
-      </div>
+        </div>
       <div className="contenido">
         <div className="categorias">
           <div className="agregar-categorias">
-            <p>Categorías</p>
-            <FaPlus
-              className="icon-agregar-categoria"
-              title="Agregar Categoría"
-              onClick={() => abrirModalAgregarCategoria()}
-            />
-          </div>
-
+      <p>Categorías</p>
+      <FaPlus 
+        className="icon-agregar-categoria" 
+        title="Agregar Categoría" 
+        onClick={() => abrirModalAgregarCategoria()} 
+      />
+    </div>
+          
           {loading ? (
             <p>Cargando...</p>
           ) : (
@@ -285,33 +282,34 @@ const cancelarEliminarPregunta = () => {
                 <li key={index} className="categoria-item">
                   <span>{cat.nombre}</span>
                   <div className="acciones">
-                    <FaQuestion
-                      className="icon-agregar"
-                      title="Agregar pregunta a la categoría"
-                      onClick={() => abrirModalAgregar(cat.nombre)}
+                     <FaQuestion 
+                      className="icon-agregar" 
+                      title="Agregar pregunta a la categoría" 
+                      onClick={() => abrirModalAgregar(cat.nombre)} 
                     />
-                    <FaEdit
-                      className="icon-ver"
-                      title="Editar preguntas de la categoría"
-                      onClick={() => abrirModal(cat.nombre)}
+
+                    <FaEdit 
+                      className="icon-ver" 
+                      title="Editar preguntas de la categoría" 
+                      onClick={() => abrirModal(cat.nombre)} 
                     />
                     {cat.visible ? (
-                      <FaEye
-                        className="icon-ocultar"
-                        title="Ocultar categoría"
-                        onClick={() => toggleVisible(cat.nombre, cat.visible)}
+                      <FaEye 
+                        className="icon-ocultar" 
+                        title="Ocultar categoría" 
+                        onClick={() => toggleVisible(cat.nombre, cat.visible)} 
                       />
                     ) : (
-                      <FaEyeSlash
-                        className="icon-mostrar"
-                        title="Mostrar categoría"
-                        onClick={() => toggleVisible(cat.nombre, cat.visible)}
+                      <FaEyeSlash 
+                        className="icon-mostrar" 
+                        title="Mostrar categoría" 
+                        onClick={() => toggleVisible(cat.nombre, cat.visible)} 
                       />
                     )}
-                    <FaTrash
-                      className="icon-eliminar"
-                      title="Eliminar categoría"
-                      onClick={() => solicitarEliminarCategoria(cat.nombre)}
+                    <FaTrash 
+                      className="icon-eliminar" 
+                      title="Eliminar categoría" 
+                      onClick={() => eliminarCategoria(cat.nombre)} 
                     />
                   </div>
                 </li>
@@ -320,110 +318,47 @@ const cancelarEliminarPregunta = () => {
           )}
         </div>
       </div>
-      
-      {/* Modal de confirmación de eliminación */}
-      {modalEliminarOpen && (
-        <div className="modal modal-confirmacion">
-          <div className="modal-content modal-confirmacion-content">
-            <div className="modal-confirmacion-header">
-              <FaTrash className="modal-confirmacion-icon" />
-              <h3>¿Eliminar categoría?</h3>
-            </div>
-            <p className="modal-confirmacion-texto">
-              ¿Estás seguro de que quieres eliminar la categoría{' '}
-              <strong>"{categoriaAEliminar}"</strong> y todas sus preguntas?
-            </p>
-            <p className="modal-confirmacion-advertencia">
-              Esta acción no se puede deshacer.
-            </p>
-            <div className="modal-confirmacion-botones">
-             <button
-                className="btn-eliminar"
-                onClick={confirmarEliminarCategoria}
-              >
-                Sí, eliminar
-              </button>
 
-                <button
-                className="btn-cancelar"
-                onClick={cancelarEliminarCategoria}
-              >
-                Cancelar
-              </button>
-            </div>
-          </div>
+      {/* Modal */}
+{modalOpen && categoriaSeleccionada && (
+  <div className="modal">
+    <div className="modal-content">
+      <h3>Preguntas de {categoriaSeleccionada}</h3>
+      {["facil", "medio", "dificil"].map(dif => (
+        <div key={dif}>
+          <h4>{dif.toUpperCase()}</h4>
+          <ul>
+            {preguntas[categoriaSeleccionada]?.[dif]?.map((p, i) => (
+              <li key={i}>
+                {/* El texto de la pregunta queda fuera del div */}
+                <span>{p.pregunta}</span>
+
+                {/* Envuelve los íconos en un div para agruparlos */}
+                <div className="acciones-pregunta">
+                  <FaEdit
+                    className="icon"
+                    title="Editar esta pregunta"
+                    onClick={() => abrirEditorPregunta(categoriaSeleccionada, dif, i, p)}
+                  />
+                  <FaTrash
+                    className='icon-borrar'
+                    title='Borrar esta pregunta'
+                    onClick={() => borrarPregunta(categoriaSeleccionada, dif, i)}
+                  />
+                </div>
+
+              </li>
+            ))}
+          </ul>
         </div>
-      )}
-      {/*Modal confirmacion de eliminacion de preguntas */}
-      {modalEliminarPreguntaOpen && (
-  <div className="modal modal-confirmacion">
-    <div className="modal-content modal-confirmacion-content">
-      <div className="modal-confirmacion-header">
-        <FaTrash className="modal-confirmacion-icon" />
-        <h3>¿Eliminar pregunta?</h3>
-      </div>
-      <p className="modal-confirmacion-texto">
-        ¿Estás seguro de que quieres eliminar esta pregunta?
-      </p>
-      <p className="modal-confirmacion-advertencia">
-        Esta acción no se puede deshacer.
-      </p>
-      <div className="modal-confirmacion-botones">
-        <button
-          className="btn-eliminar"
-          onClick={confirmarEliminarPregunta}
-        >
-          Sí, eliminar
-        </button>
-        <button
-          className="btn-cancelar"
-          onClick={cancelarEliminarPregunta}
-        >
-          Cancelar
-        </button>
+      ))}
+      <div className="modal-footer">
+         <button onClick={cerrarModal}>Cerrar</button>
       </div>
     </div>
   </div>
 )}
-
-
-
-      {/* Modal de ver/editar preguntas */}
-      {modalOpen && categoriaSeleccionada && (
-        <div className="modal">
-          <div className="modal-content">
-            <h3>Preguntas de {categoriaSeleccionada}</h3>
-            {["facil", "medio", "dificil"].map(dif => (
-              <div key={dif}>
-                <h4>{dif.toUpperCase()}</h4>
-                <ul>
-                  {preguntas[categoriaSeleccionada]?.[dif]?.map((p, i) => (
-                    <li key={i}>
-                      <span>{p.pregunta}</span>
-                      <div className="acciones-pregunta">
-                        <FaEdit
-                          className="icon"
-                          title="Editar esta pregunta"
-                          onClick={() => abrirEditorPregunta(categoriaSeleccionada, dif, i, p)}
-                        />
-                        <FaTrash
-                          className='icon-borrar'
-                          title='Borrar esta pregunta'
-                          onClick={() => borrarPregunta(categoriaSeleccionada, dif, i)}
-                        />
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-            <div className="modal-footer">
-              <button onClick={cerrarModal}>Cerrar</button>
-            </div>
-          </div>
-        </div>
-      )}
-
+      
       {/* Editor de pregunta */}
       {preguntaEditando && (
         <div className="modal">
@@ -431,9 +366,9 @@ const cancelarEliminarPregunta = () => {
             <h3>Editar pregunta</h3>
             <label>
               Pregunta:
-              <input
-                type="text"
-                value={formPregunta.pregunta}
+              <input 
+                type="text" 
+                value={formPregunta.pregunta} 
                 onChange={(e) => setFormPregunta({ ...formPregunta, pregunta: e.target.value })}
               />
             </label>
@@ -441,9 +376,9 @@ const cancelarEliminarPregunta = () => {
             {formPregunta.opciones.map((op, idx) => (
               <label key={idx}>
                 Opción {idx + 1}:
-                <input
-                  type="text"
-                  value={op}
+                <input 
+                  type="text" 
+                  value={op} 
                   onChange={(e) => {
                     const nuevasOpciones = [...formPregunta.opciones];
                     nuevasOpciones[idx] = e.target.value;
@@ -455,10 +390,10 @@ const cancelarEliminarPregunta = () => {
 
             <label>
               Respuesta correcta (1-4):
-              <input
-                type="number"
+              <input 
+                type="number" 
                 min="1" max="4"
-                value={formPregunta.respuesta_correcta}
+                value={formPregunta.respuesta_correcta} 
                 onChange={(e) => setFormPregunta({ ...formPregunta, respuesta_correcta: parseInt(e.target.value, 10) })}
               />
             </label>
@@ -470,8 +405,8 @@ const cancelarEliminarPregunta = () => {
           </div>
         </div>
       )}
-
-      {/* Modal para AGREGAR una pregunta */}
+       
+{/* Modal para AGREGAR una pregunta */}
       {modalAgregarOpen && (
         <div className="modal">
           <div className="modal-content">
@@ -486,10 +421,10 @@ const cancelarEliminarPregunta = () => {
                 <label key={idx}>
                   Opción {idx + 1}:
                   <input required type="text" value={op} onChange={(e) => {
-                    const nuevasOpciones = [...formPregunta.opciones];
-                    nuevasOpciones[idx] = e.target.value;
-                    setFormPregunta({ ...formPregunta, opciones: nuevasOpciones });
-                  }}
+                      const nuevasOpciones = [...formPregunta.opciones];
+                      nuevasOpciones[idx] = e.target.value;
+                      setFormPregunta({ ...formPregunta, opciones: nuevasOpciones });
+                    }}
                   />
                 </label>
               ))}
@@ -517,7 +452,7 @@ const cancelarEliminarPregunta = () => {
         </div>
       )}
 
-      {/* Modal para AGREGAR una Categoría */}
+        {/*Modal para AGREGAR una Categoría --- */}
       {modalAgregarCategoriaOpen && (
         <div className="modal">
           <div className="modal-content">
@@ -542,6 +477,7 @@ const cancelarEliminarPregunta = () => {
           </div>
         </div>
       )}
+
     </div>
   );
 }
