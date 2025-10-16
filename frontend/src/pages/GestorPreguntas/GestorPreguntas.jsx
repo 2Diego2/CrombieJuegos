@@ -10,7 +10,6 @@ function GestorPreguntas() {
   const [categorias, setCategorias] = useState([]);
   const [preguntas, setPreguntas] = useState({});
   const [loading, setLoading] = useState(true);
-  const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
   // Estado para el modal de VER/EDITAR preguntas
   const [modalOpen, setModalOpen] = useState(false);
@@ -37,7 +36,7 @@ function GestorPreguntas() {
 
   // cargar categorías
   const fetchCategorias = () => {
-    fetch(`${API_BASE_URL}/api/categorias`)
+    fetch("/api/categorias")
       .then(res => res.json())
       .then(data => {
         setCategorias(data);
@@ -51,7 +50,7 @@ function GestorPreguntas() {
 
   // cargar todas las preguntas
   const fetchPreguntas = () => {
-    fetch(`${API_BASE_URL}/api/preguntas`)
+    fetch("/api/preguntas")
       .then(res => res.json())
       .then(data => {
         setPreguntas(data);
@@ -84,7 +83,7 @@ function GestorPreguntas() {
 
   // toggle visibilidad
   const toggleVisible = (nombre, visible) => {
-    fetch(`${API_BASE_URL}/api/categorias/${nombre}/visibilidad/${!visible}`, {
+    fetch(`/api/categorias/${nombre}/visibilidad/${!visible}`, {
       method: "PATCH"
     })
       .then(() => fetchCategorias())
@@ -94,7 +93,7 @@ function GestorPreguntas() {
   // eliminar categoría
     const eliminarCategoria = (nombre) => {
     if (window.confirm(`¿Estás seguro de que quieres eliminar la categoría "${nombre}" y todas sus preguntas?`)) {
-      fetch(`${API_BASE_URL}/api/categorias/${nombre}`, { method: "DELETE" })
+      fetch(`/api/categorias/${nombre}`, { method: "DELETE" })
         .then(() => {
           fetchCategorias();
           fetchPreguntas();
@@ -106,7 +105,7 @@ function GestorPreguntas() {
   const guardarPregunta = () => {
     const { categoria, dificultad, index } = preguntaEditando;
 
-    fetch(`${API_BASE_URL}/api/editarpreguntas/${categoria}/${dificultad}/${index}`, {
+    fetch(`/api/editarpreguntas/${categoria}/${dificultad}/${index}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(formPregunta)
@@ -173,7 +172,7 @@ function GestorPreguntas() {
     e.preventDefault(); // Evita que el formulario recargue la página
     if (!categoriaSeleccionada) return;
 
-    fetch(`${API_BASE_URL}/api/agregarpregunta`, {
+    fetch('/api/agregarpregunta', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ categoria: categoriaSeleccionada, ...formPregunta }),
@@ -203,7 +202,7 @@ const agregarCategoria = (e) => {
       alert('El nombre de la categoría no puede estar vacío.');
       return;
     }
-    fetch(`${API_BASE_URL}/api/crearcategoria`, {
+     fetch('/api/crearcategoria', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ categoria: nuevaCategoriaNombre }),
@@ -224,7 +223,7 @@ const agregarCategoria = (e) => {
 
   const borrarPregunta = (categoria, dificultad, index) => {
     if (window.confirm('¿Estás seguro de que quieres eliminar esta pregunta?')) {
-      fetch(`${API_BASE_URL}/api/preguntas/${categoria}/${dificultad}/${index}`, {
+      fetch(`/api/preguntas/${categoria}/${dificultad}/${index}`, {
         method: 'DELETE',
       })
       .then(res => {
